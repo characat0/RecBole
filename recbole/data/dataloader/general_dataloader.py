@@ -262,10 +262,10 @@ class FullSortEvalDataLoader(AbstractDataLoader):
             history_item = self.uid2history_item[uid_list]
             positive_item = self.uid2positive_item[uid_list]
             history_u = torch.from_numpy(np.repeat(np.arange(positive_item.size), [x.size for x in positive_item]))
-            history_i = torch.cat(list(history_item))
+            history_i = torch.from_numpy(np.concat(history_item))
 
             positive_u = torch.from_numpy(np.repeat(np.arange(positive_item.size), [x.size for x in positive_item]))
-            positive_i = torch.cat(list(positive_item))
+            positive_i = torch.from_numpy(np.concat(positive_item))
 
             return user_df, (history_u, history_i), positive_u, positive_i
         else:
