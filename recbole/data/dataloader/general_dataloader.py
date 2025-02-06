@@ -91,8 +91,8 @@ class NegSampleEvalDataLoader(NegSampleDataLoader):
             config, dataset, InputType.POINTWISE, config[f"{phase}_neg_sample_args"]
         )
         if (
-            self.neg_sample_args["distribution"] != "none"
-            and self.neg_sample_args["sample_num"] != "none"
+                self.neg_sample_args["distribution"] != "none"
+                and self.neg_sample_args["sample_num"] != "none"
         ):
             user_num = dataset.user_num
             dataset.sort(by=dataset.uid_field, ascending=True)
@@ -120,8 +120,8 @@ class NegSampleEvalDataLoader(NegSampleDataLoader):
     def _init_batch_size_and_step(self):
         batch_size = self.config["eval_batch_size"]
         if (
-            self.neg_sample_args["distribution"] != "none"
-            and self.neg_sample_args["sample_num"] != "none"
+                self.neg_sample_args["distribution"] != "none"
+                and self.neg_sample_args["sample_num"] != "none"
         ):
             inters_num = sorted(self.uid2items_num * self.times, reverse=True)
             batch_num = 1
@@ -150,8 +150,8 @@ class NegSampleEvalDataLoader(NegSampleDataLoader):
     def collate_fn(self, index):
         index = np.array(index)
         if (
-            self.neg_sample_args["distribution"] != "none"
-            and self.neg_sample_args["sample_num"] != "none"
+                self.neg_sample_args["distribution"] != "none"
+                and self.neg_sample_args["sample_num"] != "none"
         ):
             uid_list = self.uid_list[index]
             data_list = []
@@ -210,8 +210,8 @@ class FullSortEvalDataLoader(AbstractDataLoader):
             positive_item = set()
             uid2used_item = sampler.used_ids
             for uid, iid in zip(
-                dataset.inter_feat[self.uid_field].numpy(),
-                dataset.inter_feat[self.iid_field].numpy(),
+                    dataset.inter_feat[self.uid_field].numpy(),
+                    dataset.inter_feat[self.iid_field].numpy(),
             ):
                 if uid != last_uid:
                     self._set_user_property(
@@ -235,11 +235,9 @@ class FullSortEvalDataLoader(AbstractDataLoader):
         if uid is None:
             return
         history_item = used_item - positive_item
-        self.uid2positive_item[uid] = torch.tensor(
-            list(positive_item), dtype=torch.int64
-        )
+        self.uid2positive_item[uid] = np.array(list(positive_item), dtype=np.int64)
         self.uid2items_num[uid] = len(positive_item)
-        self.uid2history_item[uid] = torch.tensor(list(history_item), dtype=torch.int64)
+        self.uid2history_item[uid] = np.array(list(history_item), dtype=np.int64)
 
     def _init_batch_size_and_step(self):
         batch_size = self.config["eval_batch_size"]
@@ -263,18 +261,10 @@ class FullSortEvalDataLoader(AbstractDataLoader):
 
             history_item = self.uid2history_item[uid_list]
             positive_item = self.uid2positive_item[uid_list]
-
-            history_u = torch.cat(
-                [
-                    torch.full_like(hist_iid, i)
-                    for i, hist_iid in enumerate(history_item)
-                ]
-            )
+            history_u = torch.from_numpy(np.repeat(np.arange(positive_item.size), [x.size for x in positive_item]))
             history_i = torch.cat(list(history_item))
 
-            positive_u = torch.cat(
-                [torch.full_like(pos_iid, i) for i, pos_iid in enumerate(positive_item)]
-            )
+            positive_u = torch.from_numpy(np.repeat(np.arange(positive_item.size), [x.size for x in positive_item]))
             positive_i = torch.cat(list(positive_item))
 
             return user_df, (history_u, history_i), positive_u, positive_i
