@@ -112,7 +112,10 @@ class Trainer(AbstractTrainer):
         super(Trainer, self).__init__(config, model)
 
         self.logger = getLogger()
-        self.tensorboard = get_tensorboard(self.logger)
+        if config['tensorboard']:
+            self.tensorboard = get_tensorboard(self.logger)
+        else:
+            self.tensorboard = type("SummaryWriter", (), {"__getattr__": lambda self, _: lambda *args, **kwargs: None})()
         self.wandblogger = WandbLogger(config)
         self.learner = config["learner"]
         self.learning_rate = config["learning_rate"]
