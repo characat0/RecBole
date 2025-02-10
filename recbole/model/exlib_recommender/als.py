@@ -44,8 +44,11 @@ class ALS(GeneralRecommender):
         self.als.cg_steps = self.cg_steps
 
     def calculate_loss(self, _):
-        self.als.fit(self.interaction_matrix, show_progress=False, callback=self._fit_callback)
         return self._training_loss
+
+    def train_epoch(self):
+        self.als.fit(self.interaction_matrix, show_progress=False, callback=self._fit_callback)
+        return self.calculate_loss(None)
 
     def predict(self, interaction):
         user = interaction[self.USER_ID]
