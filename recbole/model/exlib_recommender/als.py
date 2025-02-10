@@ -8,7 +8,6 @@ Reference:
 import torch
 import numpy as np
 from implicit.als import AlternatingLeastSquares
-from implicit.utils import check_random_state
 
 from recbole.utils import InputType, ModelType
 from recbole.model.abstract_recommender import GeneralRecommender
@@ -68,3 +67,8 @@ class ALS(GeneralRecommender):
         user = interaction[self.USER_ID]
         r = self.als.user_factors[user, :] @ self.als.item_factors.T
         return torch.from_numpy(r.flatten())
+
+    def other_parameter(self):
+        return {
+            'als': self.als,
+        }
