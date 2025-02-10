@@ -42,6 +42,8 @@ class ALS(GeneralRecommender):
         )
         self.als.cg_steps = self.cg_steps
 
+        self.other_parameter_name = ['als', 'random_state', 'embedding_size', 'alpha', 'regularization', 'cg_steps']
+
     def calculate_loss(self, _):
         return self._training_loss
 
@@ -67,8 +69,3 @@ class ALS(GeneralRecommender):
         user = interaction[self.USER_ID]
         r = self.als.user_factors[user, :] @ self.als.item_factors.T
         return torch.from_numpy(r.flatten())
-
-    def other_parameter(self):
-        return {
-            'als': self.als,
-        }
