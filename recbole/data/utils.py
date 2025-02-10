@@ -185,10 +185,10 @@ def data_preparation(config, dataset):
             )
 
         valid_data = get_dataloader(config, "valid")(
-            config, valid_dataset, valid_sampler, shuffle=False
+            config, valid_dataset, valid_sampler, shuffle=False, phase="valid"
         )
         test_data = get_dataloader(config, "test")(
-            config, test_dataset, test_sampler, shuffle=False
+            config, test_dataset, test_sampler, shuffle=False, phase="test"
         )
         if config["save_dataloaders"]:
             save_split_dataloaders(

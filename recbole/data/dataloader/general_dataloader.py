@@ -193,7 +193,8 @@ class FullSortEvalDataLoader(AbstractDataLoader):
         shuffle (bool, optional): Whether the dataloader will be shuffle after a round. Defaults to ``False``.
     """
 
-    def __init__(self, config, dataset, sampler, shuffle=False):
+    def __init__(self, config, dataset, sampler, shuffle=False, phase="valid"):
+        self.phase = phase
         self.logger = getLogger()
         self.uid_field = dataset.uid_field
         self.iid_field = dataset.iid_field
@@ -240,7 +241,12 @@ class FullSortEvalDataLoader(AbstractDataLoader):
         self.uid2history_item[uid] = np.array(list(history_item), dtype=np.int64)
 
     def _init_batch_size_and_step(self):
-        batch_size = self.config["eval_batch_size"]
+        if self.phase == "valid":
+            batch_size = self.config["eval_batch_size"]
+        elif self.phase == "test":
+            batch_size = self.config["test_batch_size"]
+        else:
+            raise ValueError(f"phase must be 'valid' or 'test', but get {self.phase}")
         if not self.is_sequential:
             batch_num = max(batch_size // self._dataset.item_num, 1)
             new_batch_size = batch_num * self._dataset.item_num
