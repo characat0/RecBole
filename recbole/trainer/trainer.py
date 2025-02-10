@@ -1483,3 +1483,10 @@ class NCLTrainer(Trainer):
                     set_color("GPU RAM: " + get_gpu_usage(self.device), "yellow")
                 )
         return total_loss
+
+
+class ALSTrainer(Trainer):
+    def _train_epoch(self, train_data, epoch_idx, loss_func=None, show_progress=False):
+        loss = self.model.calculate_loss()
+        return loss
+
