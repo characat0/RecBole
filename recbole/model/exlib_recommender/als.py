@@ -69,7 +69,7 @@ class ALS(GeneralRecommender):
     def full_sort_predict(self, interaction):
         user = interaction[self.USER_ID].cpu()
         u_factor = torch.from_numpy(self.als.user_factors[user, :]).to(self.device)
-        if self.i_factor is None:
+        if self.i_factor is None or (self.i_factor.size(0) != u_factor.size(1)):
             self.i_factor = torch.from_numpy(self.als.item_factors.T).to(self.device)
         r = u_factor @  self.i_factor
         return r.view(-1)
