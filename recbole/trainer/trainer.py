@@ -1487,6 +1487,6 @@ class NCLTrainer(Trainer):
 
 class ALSTrainer(Trainer):
     def _train_epoch(self, train_data, epoch_idx, loss_func=None, show_progress=False):
-        loss = self.model.calculate_loss()
+        loss = self.model.calculate_loss(None)
         return loss
 
