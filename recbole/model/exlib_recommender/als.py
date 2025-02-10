@@ -41,6 +41,7 @@ class ALS(GeneralRecommender):
             calculate_training_loss=True,
         )
         self.als.cg_steps = self.cg_steps
+        self.i_factor = None
 
         self.other_parameter_name = ['als', 'random_state', 'embedding_size', 'alpha', 'regularization', 'cg_steps']
 
@@ -67,5 +68,7 @@ class ALS(GeneralRecommender):
 
     def full_sort_predict(self, interaction):
         user = interaction[self.USER_ID]
-        r = self.als.user_factors[user, :] @ self.als.item_factors.T
-        return torch.from_numpy(r.flatten())
+        u_factor = torch.from_numpy(self.als.user_factors[user, :]).to(self.device)
+        self.i_factor = self.i_factor or torch.from_numpy(self.als.item_factors.T).to(self.device)
+        r = u_factor @  self.i_factor
+        return r.view(-1)
