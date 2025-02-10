@@ -25,6 +25,7 @@ class ALS(GeneralRecommender):
         super(ALS, self).__init__(config, dataset)
         self.random_state = config['seed']
         self.embedding_size = config['embedding_size']
+        self.alpha = config['alpha']
         self.regularization = config['reg_weight']
         self.cg_steps = config['cg_steps']
         # load parameters info
@@ -34,6 +35,7 @@ class ALS(GeneralRecommender):
         self._fit_callback = lambda _, __, loss: self.__setattr__('_training_loss', loss)
         self.als = AlternatingLeastSquares(
             factors=self.embedding_size,
+            alpha=self.alpha,
             regularization=self.regularization,
             iterations=1,
             random_state=self.random_state,
