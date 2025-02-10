@@ -53,8 +53,8 @@ class ALS(GeneralRecommender):
         return self.calculate_loss(None)
 
     def predict(self, interaction):
-        user = interaction[self.USER_ID]
-        item = interaction[self.ITEM_ID]
+        user = interaction[self.USER_ID].cpu()
+        item = interaction[self.ITEM_ID].cpu()
 
         user_embedding = self.als.user_factors[user, :]
         item_embedding = self.als.item_factors[item, :]
@@ -67,7 +67,7 @@ class ALS(GeneralRecommender):
         )
 
     def full_sort_predict(self, interaction):
-        user = interaction[self.USER_ID]
+        user = interaction[self.USER_ID].cpu()
         u_factor = torch.from_numpy(self.als.user_factors[user, :]).to(self.device)
         self.i_factor = self.i_factor or torch.from_numpy(self.als.item_factors.T).to(self.device)
         r = u_factor @  self.i_factor
