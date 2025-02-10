@@ -27,9 +27,9 @@ class ALS(GeneralRecommender):
         self.embedding_size = config['embedding_size']
         self.alpha = config['alpha']
         self.regularization = config['reg_weight']
-        self.cg_steps = config['cg_steps']
+        self.cg_steps = config['cg_steps'] or 1
         # load parameters info
-        self.reg_weight = config['reg_weight']
+        self.dummy_param = torch.nn.Parameter(torch.zeros(1))
         self._training_loss = 0
         self.interaction_matrix = dataset.inter_matrix(form='csr').astype(np.float32)
         self._fit_callback = lambda _, __, loss: self.__setattr__('_training_loss', loss)
