@@ -489,7 +489,7 @@ class Dataset(torch.utils.data.Dataset):
             usecols=usecols,
             dtype=dtype,
             encoding=encoding,
-            engine="python",
+            engine="c",
         )
         df.columns = columns
 
