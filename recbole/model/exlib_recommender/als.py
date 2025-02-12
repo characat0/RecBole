@@ -45,12 +45,12 @@ class ALS(GeneralRecommender):
 
         self.other_parameter_name = ['als', 'random_state', 'embedding_size', 'alpha', 'regularization', 'cg_steps']
 
-    def calculate_loss(self, _):
+    def calculate_loss(self, _=None):
         return self._training_loss
 
     def train_epoch(self):
         self.als.fit(self.interaction_matrix, show_progress=False, callback=self._fit_callback)
-        return self.calculate_loss(None)
+        return self.calculate_loss()
 
     def predict(self, interaction):
         user = interaction[self.USER_ID].cpu()
