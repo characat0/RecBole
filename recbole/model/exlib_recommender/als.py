@@ -30,7 +30,7 @@ class ALS(GeneralRecommender):
         # load parameters info
         self.dummy_param = torch.nn.Parameter(torch.zeros(1))
         self._training_loss = 0
-        self.interaction_matrix = dataset.inter_matrix(form='csr').astype(np.float32)
+        self.interaction_matrix = dataset.inter_matrix(form='csr', value_field=config['RATING_FIELD']).astype(np.float32)
         self._fit_callback = lambda _, __, loss: self.__setattr__('_training_loss', loss)
         self.als = AlternatingLeastSquares(
             factors=self.embedding_size,
