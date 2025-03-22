@@ -84,9 +84,10 @@ class NegSampleEvalDataLoader(NegSampleDataLoader):
         shuffle (bool, optional): Whether the dataloader will be shuffle after a round. Defaults to ``False``.
     """
 
-    def __init__(self, config, dataset, sampler, shuffle=False):
+    def __init__(self, config, dataset, sampler, shuffle=False, phase=None):
         self.logger = getLogger()
-        phase = sampler.phase if sampler is not None else "test"
+        if phase is None:
+            phase = sampler.phase if sampler is not None else "test"
         self._set_neg_sample_args(
             config, dataset, InputType.POINTWISE, config[f"{phase}_neg_sample_args"]
         )
@@ -244,7 +245,7 @@ class FullSortEvalDataLoader(AbstractDataLoader):
         if self.phase == "valid":
             batch_size = self.config["eval_batch_size"]
         elif self.phase == "test":
-            batch_size = self.config["test_batch_size"]
+            batch_size = self.config["test_batch_size"] or self.config["eval_batch_size"]
         else:
             raise ValueError(f"phase must be 'valid' or 'test', but get {self.phase}")
         if not self.is_sequential:
