@@ -477,7 +477,13 @@ class Dataset(torch.utils.data.Dataset):
                     self.field2bucketnum[field] = 2
             columns.append(field)
             usecols.append(field_type)
-            dtype[field_type] = np.float64 if ftype == FeatureType.FLOAT else str
+            if ftype == FeatureType.POSITION:
+                dtype[field_type] = np.int64
+            elif ftype == FeatureType.FLOAT:
+                dtype[field_type] = np.float64
+            else:
+                dtype[field_type] = str
+            # dtype[field_type] = np.float64 if ftype == FeatureType.FLOAT else str
 
         if len(columns) == 0:
             self.logger.warning(f"No columns has been loaded from [{source}]")
@@ -2158,4 +2164,6 @@ class Dataset(torch.utils.data.Dataset):
                         torch.FloatTensor(d[: self.field2seqlen[k]]) for d in value
                     ]
                     new_data[k] = rnn_utils.pad_sequence(seq_data, batch_first=True)
+            elif ftype == FeatureType.POSITION:
+                new_data[k] = torch.LongTensor(value)
         return Interaction(new_data)

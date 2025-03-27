@@ -71,12 +71,14 @@ class FeatureType(Enum):
     - ``FLOAT``: Float features like rating and timestamp.
     - ``TOKEN_SEQ``: Token sequence features like review.
     - ``FLOAT_SEQ``: Float sequence features like pretrained vector.
+    - ``POSITION``: Integer used for position encoding.
     """
 
     TOKEN = "token"
     FLOAT = "float"
     TOKEN_SEQ = "token_seq"
     FLOAT_SEQ = "float_seq"
+    POSITION = "position"
 
 
 class FeatureSource(Enum):

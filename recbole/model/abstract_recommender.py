@@ -18,7 +18,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from recbole.model.layers import FMEmbedding, FMFirstOrderLinear, FLEmbedding
+from recbole.model.layers import FMEmbedding, FMFirstOrderLinear, FLEmbedding, RotaryPositionalEmbeddings
 from recbole.utils import ModelType, InputType, FeatureSource, FeatureType, set_color
 
 
@@ -240,6 +240,7 @@ class ContextRecommender(AbstractRecommender):
         self.numerical_features = config["numerical_features"]
         if self.double_tower is None:
             self.double_tower = False
+        self.positional_encoding = config.final_config_dict.get("positional_encoding", {"position_field": None, "embed_field": None, "max_sequence_length": None})
         self.token_field_names = []
         self.token_field_dims = []
         self.float_field_names = []
@@ -282,6 +283,10 @@ class ContextRecommender(AbstractRecommender):
         for field_name in self.field_names:
             if field_name == self.LABEL:
                 continue
+            if field_name == self.positional_encoding["position_field"]:
+                continue
+            # if dataset.field2type[field_name] == FeatureType.POSITION:
+            #     self.positional_encoding['position_field'] = field_name
             if dataset.field2type[field_name] == FeatureType.TOKEN:
                 self.token_field_names.append(field_name)
                 self.token_field_dims.append(dataset.num(field_name))
@@ -311,6 +316,10 @@ class ContextRecommender(AbstractRecommender):
             self.token_embedding_table = FMEmbedding(
                 self.token_field_dims, self.token_field_offsets, self.embedding_size
             )
+        pe_field = self.positional_encoding["position_field"]
+        if pe_field is not None:
+            max_seq_length = self.positional_encoding["max_sequence_length"] or dataset.field2feats(pe_field)[0].max() + 1
+            self.positional_embedding = RotaryPositionalEmbeddings(self.embedding_size, max_seq_length)
         if len(self.float_field_dims) > 0:
             self.float_field_offsets = np.array(
                 (0, *np.cumsum(self.float_field_dims)[:-1]), dtype=np.long
@@ -592,6 +601,12 @@ class ContextRecommender(AbstractRecommender):
             token_fields = None
         # [batch_size, num_token_field, embed_dim] or None
         token_fields_embedding = self.embed_token_fields(token_fields)
+        position = self.positional_encoding["position_field"]
+        if position is not None:
+            pos_embed_field = self.positional_encoding["embed_field"]
+            position_field = interaction[position].unsqueeze(1)
+            i = self.token_field_names.index(pos_embed_field)
+            token_fields_embedding[:, i] = self.positional_embedding(token_fields_embedding[:, i], input_pos=position_field)
 
         token_seq_fields = []
         for field_name in self.token_seq_field_names:
