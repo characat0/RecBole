@@ -748,8 +748,6 @@ class Dataset(torch.utils.data.Dataset):
                 info = dis_info[field]
                 method = info["method"]
                 bucket = None
-                if method is None:
-                    continue
                 if method == "ED":
                     if "bucket" in info:
                         bucket = info["bucket"]
