@@ -36,7 +36,7 @@ def get_local_time():
         str: current time
     """
     cur = datetime.datetime.now()
-    cur = cur.strftime("%b-%d-%Y_%H-%M-%S")
+    cur = cur.strftime("%b-%d-%Y_%H-%M-%S_%f")
 
     return cur
 
