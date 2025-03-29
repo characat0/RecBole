@@ -583,12 +583,14 @@ class Trainer(AbstractTrainer):
 
         if load_best_model:
             checkpoint_file = model_file or self.saved_model_file
-            checkpoint = torch.load(checkpoint_file, map_location=self.device, weights_only=False)
+            checkpoint = torch.load(checkpoint_file, map_location='cpu', weights_only=False)
+            self.model.to('cpu')
             self.model.load_state_dict(checkpoint["state_dict"])
             self.model.load_other_parameter(checkpoint.get("other_parameter"))
             message_output = "Loading model structure and parameters from {}".format(
                 checkpoint_file
             )
+            self.model.to(self.device)
             self.logger.info(message_output)
 
         self.model.eval()
