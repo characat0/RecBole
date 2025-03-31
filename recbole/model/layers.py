@@ -1513,7 +1513,7 @@ class FMFirstOrderLinear(nn.Module):
                 torch.cat(fields_result, dim=1), dim=1, keepdim=True
             )  # [batch_size, num_token_seq_field, embed_dim]
 
-    def embed_token_fields(self, token_fields):
+    def embed_token_fields(self, token_fields, positions=None):
         """Calculate the first order score of token feature columns
 
         Args:
@@ -1527,6 +1527,12 @@ class FMFirstOrderLinear(nn.Module):
             return None
         # [batch_size, num_token_field, embed_dim]
         token_embedding = self.token_embedding_table(token_fields)
+        if positions is not None:
+            for i, position in enumerate(positions):
+                if position is not None:
+                    token_embedding[:, i] = self.positional_embedding(
+                        token_embedding[:, i], input_pos=position
+                    )
         # [batch_size, 1, output_dim]
         token_embedding = torch.sum(token_embedding, dim=1, keepdim=True)
 
@@ -1607,7 +1613,17 @@ class FMFirstOrderLinear(nn.Module):
         else:
             token_fields = None
         # [batch_size, 1, output_dim] or None
-        token_fields_embedding = self.embed_token_fields(token_fields)
+        position = self.positional_encoding["position_field"]
+        positions = None
+        if position is not None:
+            positions = []
+            for field_name in self.token_field_names:
+                if field_name == self.positional_encoding["embed_field"]:
+                    position_field = interaction[field_name]
+                    positions.append(position_field)
+                else:
+                    positions.append(None)
+        token_fields_embedding = self.embed_token_fields(token_fields, positions)
 
         position = self.positional_encoding["position_field"]
         if position is not None:
