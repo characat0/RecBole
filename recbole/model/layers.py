@@ -1611,10 +1611,10 @@ class FMFirstOrderLinear(nn.Module):
 
         position = self.positional_encoding["position_field"]
         if position is not None:
-            # pos_embed_field = self.positional_encoding["embed_field"]
+            pos_embed_field = self.positional_encoding["embed_field"]
             position_field = interaction[position].unsqueeze(1)
-            # i = self.token_field_names.index(pos_embed_field)
-            token_fields_embedding[:, 0] = self.positional_embedding(token_fields_embedding[:, 0], input_pos=position_field)
+            i = self.token_field_names.index(pos_embed_field)
+            token_fields_embedding[:, 0] = self.positional_embedding(token_fields_embedding[:, 0, i], input_pos=position_field)
 
         if token_fields_embedding is not None:
             total_fields_embedding.append(token_fields_embedding)
