@@ -1527,7 +1527,6 @@ class FMFirstOrderLinear(nn.Module):
             return None
         # [batch_size, num_token_field, embed_dim]
         token_embedding = self.token_embedding_table(token_fields)
-        raise ValueError(token_embedding.shape)
         if positions is not None:
             for i, position in enumerate(positions):
                 if position is not None:
@@ -1620,7 +1619,7 @@ class FMFirstOrderLinear(nn.Module):
             positions = []
             for field_name in self.token_field_names:
                 if field_name == self.positional_encoding["embed_field"]:
-                    position_field = interaction[field_name].unsqueeze(1)
+                    position_field = interaction[field_name]
                     positions.append(position_field)
                 else:
                     positions.append(None)
