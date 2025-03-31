@@ -1375,7 +1375,6 @@ class FMFirstOrderLinear(nn.Module):
         self.numerical_features = config["numerical_features"]
         self.token_field_names = []
         self.token_field_dims = []
-        self.positional_encoding = config.final_config_dict.get("positional_encoding", {"position_field": None, "embed_field": None, "max_sequence_length": None})
         self.float_field_names = []
         self.float_field_dims = []
         self.token_seq_field_names = []
@@ -1412,10 +1411,6 @@ class FMFirstOrderLinear(nn.Module):
             self.token_embedding_table = FMEmbedding(
                 self.token_field_dims, self.token_field_offsets, output_dim
             )
-        pe_field = self.positional_encoding["position_field"]
-        if pe_field is not None:
-            max_seq_length = self.positional_encoding["max_sequence_length"] or dataset.field2feats(pe_field)[0].max() + 1
-            self.positional_embedding = RotaryPositionalEmbeddings(self.embedding_size, max_seq_length)
         if len(self.float_field_dims) > 0:
             self.float_field_offsets = np.array(
                 (0, *np.cumsum(self.float_field_dims)[:-1]), dtype=np.long
@@ -1608,14 +1603,6 @@ class FMFirstOrderLinear(nn.Module):
             token_fields = None
         # [batch_size, 1, output_dim] or None
         token_fields_embedding = self.embed_token_fields(token_fields)
-
-        position = self.positional_encoding["position_field"]
-        if position is not None:
-            pos_embed_field = self.positional_encoding["embed_field"]
-            position_field = interaction[position].unsqueeze(1)
-            i = self.token_field_names.index(pos_embed_field)
-            token_fields_embedding[:, i] = self.positional_embedding(token_fields_embedding[:, i], input_pos=position_field)
-
         if token_fields_embedding is not None:
             total_fields_embedding.append(token_fields_embedding)
 
