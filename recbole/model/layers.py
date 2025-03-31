@@ -1415,7 +1415,7 @@ class FMFirstOrderLinear(nn.Module):
         pe_field = self.positional_encoding["position_field"]
         if pe_field is not None:
             max_seq_length = self.positional_encoding["max_sequence_length"] or dataset.field2feats(pe_field)[0].max() + 1
-            self.positional_embedding = RotaryPositionalEmbeddings(self.embedding_size, max_seq_length)
+            self.positional_embedding = RotaryPositionalEmbeddings(config['embedding_size'], max_seq_length)
         if len(self.float_field_dims) > 0:
             self.float_field_offsets = np.array(
                 (0, *np.cumsum(self.float_field_dims)[:-1]), dtype=np.long
