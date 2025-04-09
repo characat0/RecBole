@@ -63,7 +63,6 @@ class ALS(GeneralRecommender):
         return torch.from_numpy(
             (user_embedding @ item_embedding)
             .sum(axis=1)
-            .getA1()
         )
 
     def full_sort_predict(self, interaction):
