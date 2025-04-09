@@ -57,7 +57,7 @@ class ALS(GeneralRecommender):
         item = interaction[self.ITEM_ID].cpu()
 
         user_embedding = self.als.user_factors[user, :]
-        item_embedding = self.als.item_factors[item, :]
+        item_embedding = self.als.item_factors[item, :].T
 
         # We calculate the sum because item is repeated
         return torch.from_numpy(
