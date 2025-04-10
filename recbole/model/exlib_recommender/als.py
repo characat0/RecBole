@@ -56,14 +56,11 @@ class ALS(GeneralRecommender):
         user = interaction[self.USER_ID].cpu()
         item = interaction[self.ITEM_ID].cpu()
 
-        user_embedding = self.als.user_factors[user, :]
-        item_embedding = self.als.item_factors[item, :].T
+        user_embedding = torch.from_numpy(self.als.user_factors[user, :]).to(self.device)
+        item_embedding = torch.from_numpy(self.als.item_factors[item, :].T).to(self.device)
 
         # We calculate the sum because item is repeated
-        return torch.from_numpy(
-            (user_embedding @ item_embedding)
-            .sum(axis=1)
-        ).to(self.device)
+        return (user_embedding @ item_embedding).sum(1)
 
     def full_sort_predict(self, interaction):
         user = interaction[self.USER_ID].cpu()
