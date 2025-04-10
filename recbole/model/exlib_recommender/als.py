@@ -63,7 +63,7 @@ class ALS(GeneralRecommender):
         return torch.from_numpy(
             (user_embedding @ item_embedding)
             .sum(axis=1)
-        )
+        ).to(self.device)
 
     def full_sort_predict(self, interaction):
         user = interaction[self.USER_ID].cpu()
